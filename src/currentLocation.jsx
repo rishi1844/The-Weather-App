@@ -76,39 +76,40 @@ class Weather extends Component {
   };
   
 
-  getWeather = async (lat, lon) => {
-    try {
-      const weatherResponse = await fetch(
-        `${apiKeys.base}weather?lat=${lat}&lon=${lon}&units=metric&APPID=${apiKeys.key}`
-      );
-      const weatherData = await weatherResponse.json();
-  
-      if (!weatherData.main) throw new Error("Weather data unavailable.");
-  
-      const locationResponse = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
-      );
-      const locationData = await locationResponse.json();
-      const cityName = locationData.address.city || locationData.address.town || "Unknown";
-  
-      this.setState({
-        lat,
-        lon,
-        city: cityName,
-        country: weatherData.sys.country || "Unknown",
-        temperatureC: Math.round(weatherData.main.temp),
-        temperatureF: Math.round(weatherData.main.temp * 1.8 + 32),
-        humidity: weatherData.main.humidity || "N/A",
-        description: weatherData.weather[0]?.main || "Unknown",
-        sunrise: this.getTimeFromUnixTimeStamp(weatherData.sys.sunrise),
-        sunset: this.getTimeFromUnixTimeStamp(weatherData.sys.sunset),
-        icon: this.getWeatherIcon(weatherData.weather[0]?.main),
-      });
-    } catch (error) {
-      console.error("Error fetching weather data:", error);
-      this.setState({ errorMsg: "Unable to retrieve weather data." });
-    }
-  };
+getWeather = async (lat, lon) => {
+  try {
+    // Fetch weather data from OpenWeather
+    const weatherResponse = await fetch(
+      `${apiKeys.base}weather?lat=${lat}&lon=${lon}&units=metric&APPID=${apiKeys.key}`
+    );
+    const weatherData = await weatherResponse.json();
+
+    // Fetch city name using Reverse Geocoding API
+    const geoResponse = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+    );
+    const geoData = await geoResponse.json();
+
+    const cityName = geoData.address.city || geoData.address.town || geoData.address.village || "Unknown";
+
+    this.setState({
+      lat,
+      lon,
+      city: cityName,  // Now it will show the correct city
+      country: weatherData.sys.country || "Unknown",
+      temperatureC: Math.round(weatherData.main.temp),
+      temperatureF: Math.round(weatherData.main.temp * 1.8 + 32),
+      description: weatherData.weather[0]?.main || "Unknown",
+      sunrise: this.getTimeFromUnixTimeStamp(weatherData.sys.sunrise),
+      sunset: this.getTimeFromUnixTimeStamp(weatherData.sys.sunset),
+      icon: this.getWeatherIcon(weatherData.weather[0]?.main),
+    });
+  } catch (error) {
+    console.error("Error fetching weather data:", error);
+    this.setState({ errorMsg: "Unable to retrieve weather data." });
+  }
+};
+
   
 
   getWeatherIcon = (weatherCondition) => {
