@@ -205,6 +205,29 @@ body a {
   text-decoration: none;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  flex: 1;
+}
+
+.footer-info {
+  text-align: center;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+}
+
+
 h1 {
   font-size: 50px;
   font-weight: 400;
@@ -305,7 +328,6 @@ div#txt {
 
 .forecast-icon {
   padding: 25px 0;
-  /* background: white; */
 }
 
 .today-weather h3 {
@@ -375,7 +397,10 @@ div#txt {
 
 @media screen and (max-width: 1280px) {
   .container {
-    width: 60%;
+    width: 80%;
+  }
+  .forecast-icon{
+    padding: 5px 0;
   }
 }
 
@@ -404,7 +429,7 @@ div#txt {
     font-size: 35px;
   }
   .temperature p {
-    font-size: 100px;
+    font-size: 80px;
   }
   .dmy {
     padding-top: 25px;
@@ -465,6 +490,7 @@ div#txt {
   }
   .temperature {
     text-align: right;
+    top: -100px;
   }
   .temperature p {
     font-size: 100px;
@@ -560,12 +586,13 @@ div#txt {
     font-size: 13px;
   }
   .container {
-    height: 60vh;
-    margin-top: 60px;
+    height: 80vh;
+    margin-top: 30px;
   }
   .mb-icon {
-    top: 20% !important;
+    top: 16% !important;
     display: block !important;
+    height: auto !important;
   }
   .forecast-icon,
   .today-weather h3 {
@@ -595,6 +622,12 @@ div#txt {
   }
   .temperature p {
     padding-bottom: 15px;
+  }
+  .footer-info{
+    display: none;
+  }
+  .container {
+    flex: unset;
   }
 }
 
@@ -658,9 +691,8 @@ div#txt {
   top: 2%;
   font-size: 25px;
 }
-.footer-info {
-  color: white;
-}
+
+
 .footer-info a {
   color: floralwhite;
   font-weight: bold;
@@ -683,3 +715,35 @@ div#txt {
   right: 20px;
   top: 1.5%;
 }
+
+
+.city-details {
+  background-color: rgba(255, 255, 255, 0.1); /* Light transparent background */
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 15px;
+  color: white; /* White text for visibility */
+  font-size: 16px;
+  box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+  text-align: left;
+}
+
+.city-details h5 {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+  color: #ffcc00; /* Highlighted heading */
+}
+
+.city-details p {
+  margin: 5px 0;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.city-details strong {
+  color: #ffdf80; /* Light yellow for emphasis */
+}
+
+

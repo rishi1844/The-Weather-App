@@ -4,17 +4,19 @@ import apiKeys from "./apiKeys";
 import ReactAnimatedWeather from "react-animated-weather";
 
 const defaults = {
-    color: "white",
-    size: 112,
-    animate: true,
+  color: "white",
+  size: 112,
+  animate: true,
 };
 
 function Forcast(props) {
   const [query, setQuery] = useState("");
   const [error, setError] = useState("");
   const [weather, setWeather] = useState(null);
+  const [cityDetails, setCityDetails] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
 
+  // Function to fetch city details
   const fetchCitySuggestions = async (input) => {
     if (input.length < 3) {
       setSuggestions([]);
@@ -31,27 +33,37 @@ function Forcast(props) {
     }
   };
 
-  const search = (city) => {
-    axios
-      .get(
+  // Function to fetch weather details
+  const search = async (city) => {
+    try {
+      const weatherResponse = await axios.get(
         `${apiKeys.base}weather?q=${city}&units=metric&APPID=${apiKeys.key}`
-      )
-      .then((response) => {
-        setWeather(response.data);
-        setQuery("");
-        setSuggestions([]);
-      })
-      .catch((error) => {
-        console.log(error);
-        setWeather(null);
-        setQuery("");
-        setError("City not found");
-      });
+      );
+      setWeather(weatherResponse.data);
+      setQuery("");
+      setSuggestions([]);
+
+      // Fetch city details using reverse geocoding
+      const locationResponse = await axios.get(
+        `https://nominatim.openstreetmap.org/search?city=${city}&format=json&limit=1`
+      );
+      setCityDetails(locationResponse.data[0] || null);
+    } catch (error) {
+      console.log(error);
+      setWeather(null);
+      setQuery("");
+      setError("City not found");
+    }
   };
 
   useEffect(() => {
     search("Delhi");
   }, []);
+
+  // Function to format time from Unix timestamp
+  const formatTime = (timestamp) => {
+    return new Date(timestamp * 1000).toLocaleTimeString();
+  };
 
   return (
     <div className="forecast">
@@ -61,6 +73,7 @@ function Forcast(props) {
 
       <div className="today-weather">
         <h3>{weather ? weather.weather[0].main : ""}</h3>
+
         <div className="search-box">
           <input
             type="text"
@@ -82,6 +95,8 @@ function Forcast(props) {
             />
           </div>
         </div>
+
+        {/* Display city suggestions */}
         <ul className="suggestions">
           {suggestions.map((city, index) => (
             <li key={index} onClick={() => search(city.name)}>
@@ -89,6 +104,8 @@ function Forcast(props) {
             </li>
           ))}
         </ul>
+
+        {/* Display Weather and City Details */}
         {weather ? (
           <ul>
             <li className="cityHead">
@@ -102,20 +119,38 @@ function Forcast(props) {
               />
             </li>
             <li>
-              Temperature: <span className="temp">{Math.round(weather.main.temp)}°C ({weather.weather[0].main})</span>
+              🌡 Temperature: <span className="temp">{Math.round(weather.main.temp)}°C ({weather.weather[0].main})</span>
             </li>
             <li>
-              Humidity: <span className="temp">{weather.main.humidity}%</span>
+              💧 Humidity: <span className="temp">{weather.main.humidity}%</span>
             </li>
             <li>
-              Visibility: <span className="temp">{(weather.visibility / 1000).toFixed(1)} km</span>
+              🌪 Wind Speed: <span className="temp">{Math.round(weather.wind.speed)} km/h</span>
             </li>
             <li>
-              Wind Speed: <span className="temp">{Math.round(weather.wind.speed)} km/h</span>
+              🔍 Visibility: <span className="temp">{(weather.visibility / 1000).toFixed(1)} km</span>
+            </li>
+            <li>
+              🌅 Sunrise: <span className="temp">{formatTime(weather.sys.sunrise)}</span>
+            </li>
+            <li>
+              🌇 Sunset: <span className="temp">{formatTime(weather.sys.sunset)}</span>
+            </li>
+            <li>
+              📌 Pressure: <span className="temp">{weather.main.pressure} hPa</span>
             </li>
           </ul>
         ) : (
           <p className="error">{error}</p>
+        )}
+
+        {/* Show additional city details */}
+        {cityDetails && (
+          <div className="city-details">
+            <h4>📍 Location Details</h4>
+            <p><strong>City:</strong> {cityDetails.display_name}</p>
+            <p><strong>Type:</strong> {cityDetails.type}</p>
+          </div>
         )}
       </div>
     </div>

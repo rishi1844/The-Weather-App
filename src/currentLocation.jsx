@@ -68,39 +68,48 @@ class Weather extends Component {
 
   getPosition = () => {
     return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject);
+      navigator.geolocation.getCurrentPosition(resolve, (error) => {
+        console.error("Geolocation error:", error);
+        reject(error);
+      });
     });
   };
+  
 
   getWeather = async (lat, lon) => {
     try {
-      const api_call = await fetch(
+      const weatherResponse = await fetch(
         `${apiKeys.base}weather?lat=${lat}&lon=${lon}&units=metric&APPID=${apiKeys.key}`
       );
-      const data = await api_call.json();
-
-      if (!data.main) {
-        throw new Error("Weather data unavailable.");
-      }
-
+      const weatherData = await weatherResponse.json();
+  
+      if (!weatherData.main) throw new Error("Weather data unavailable.");
+  
+      const locationResponse = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+      );
+      const locationData = await locationResponse.json();
+      const cityName = locationData.address.city || locationData.address.town || "Unknown";
+  
       this.setState({
         lat,
         lon,
-        city: data.name || "Unknown",
-        country: data.sys.country || "Unknown",
-        temperatureC: Math.round(data.main.temp),
-        temperatureF: Math.round(data.main.temp * 1.8 + 32),
-        humidity: data.main.humidity || "N/A",
-        description: data.weather[0]?.main || "Unknown",
-        sunrise: this.getTimeFromUnixTimeStamp(data.sys.sunrise),
-        sunset: this.getTimeFromUnixTimeStamp(data.sys.sunset),
-        icon: this.getWeatherIcon(data.weather[0]?.main),
+        city: cityName,
+        country: weatherData.sys.country || "Unknown",
+        temperatureC: Math.round(weatherData.main.temp),
+        temperatureF: Math.round(weatherData.main.temp * 1.8 + 32),
+        humidity: weatherData.main.humidity || "N/A",
+        description: weatherData.weather[0]?.main || "Unknown",
+        sunrise: this.getTimeFromUnixTimeStamp(weatherData.sys.sunrise),
+        sunset: this.getTimeFromUnixTimeStamp(weatherData.sys.sunset),
+        icon: this.getWeatherIcon(weatherData.weather[0]?.main),
       });
     } catch (error) {
       console.error("Error fetching weather data:", error);
       this.setState({ errorMsg: "Unable to retrieve weather data." });
     }
   };
+  
 
   getWeatherIcon = (weatherCondition) => {
     const iconMap = {
