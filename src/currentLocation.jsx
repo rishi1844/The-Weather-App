@@ -112,21 +112,23 @@ getWeather = async (lat, lon) => {
 
   
 
-  getWeatherIcon = (weatherCondition) => {
-    const iconMap = {
-      Haze: "CLEAR_DAY",
-      Clouds: "CLOUDY",
-      Rain: "RAIN",
-      Snow: "SNOW",
-      Dust: "WIND",
-      Drizzle: "SLEET",
-      Fog: "FOG",
-      Smoke: "FOG",
-      Tornado: "WIND",
-      Clear: "CLEAR_DAY",
-    };
-
-    return iconMap[weatherCondition] || "CLEAR_DAY";
+    getWeatherIcon = (weatherCondition) => {
+  const iconMap = {
+    haze: "CLEAR_DAY",
+    clouds: "CLOUDY",
+    rain: "RAIN",
+    snow: "SNOW",
+    dust: "WIND",
+    drizzle: "SLEET",
+    fog: "FOG",
+    smoke: "FOG",
+    tornado: "WIND",
+    clear: "CLEAR_DAY",
+    thunderstorm: "RAIN",
+    mist: "FOG",
+    "scattered clouds": "PARTLY_CLOUDY_DAY",
+    "broken clouds": "PARTLY_CLOUDY_DAY",
+    "few clouds": "PARTLY_CLOUDY_DAY",
   };
 
   getTimeFromUnixTimeStamp = (timestamp) => {
