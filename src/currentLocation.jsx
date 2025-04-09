@@ -111,8 +111,7 @@ getWeather = async (lat, lon) => {
 };
 
   
-
-    getWeatherIcon = (weatherCondition) => {
+  getWeatherIcon = (weatherCondition) => {
   const iconMap = {
     haze: "CLEAR_DAY",
     clouds: "CLOUDY",
@@ -130,6 +129,10 @@ getWeather = async (lat, lon) => {
     "broken clouds": "PARTLY_CLOUDY_DAY",
     "few clouds": "PARTLY_CLOUDY_DAY",
   };
+
+  // Convert weather condition to lowercase and match it
+  return iconMap[weatherCondition.toLowerCase()] || "CLEAR_DAY";
+};
 
   getTimeFromUnixTimeStamp = (timestamp) => {
     const date = new Date(timestamp * 1000);
